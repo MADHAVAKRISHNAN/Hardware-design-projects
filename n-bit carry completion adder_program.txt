@@ -1,0 +1,95 @@
+#include<stdio.h>
+void main()
+{
+int bit;    // variable for number of bit
+int temp=0; // variable to store the count value in the do while loop
+int i=0;    // loop variable
+int n_iteration=0;//variable holding no of iteration track do while loop
+int a[48],b[48];  //input binary number
+int cin0[49], cin1[49],cout0[49],cout1[49];//input carry and output carry
+int num_test=1;  // variable to hold number of tests used to cqalculate the average delay
+float totaldelay=0, averagedelay =0;
+int delay=0;     // variable to calculate the delay of each cycle of cca
+
+for(bit=1;bit<49;bit++) 
+{
+totaldelay=0;
+for( num_test=0;num_test<1000000;num_test++)
+{
+cin0[bit]=1;
+cin1[bit]=0;
+cout0[bit]=0;
+cout1[bit]=0;
+for(i=0;i<bit;i++)
+{
+a[i]= rand()%2; // random number generation for input
+b[i]= rand()%2;
+cin0[i]=0;
+cin1[i]=0;
+}
+n_iteration=0;
+delay=0;
+do             
+{
+n_iteration++;
+delay=delay+2;
+temp=0;
+for(i=(bit-1);i>=0;i--)
+{
+cout0[i]= findc0(a[i],b[i],cin0[i+1]); // calls the function which 							calculates the output zero carry
+cout1[i]= findc1(a[i],b[i],cin1[i+1]); // calls the function which 							calculates the output one carry
+
+if(cout0[i] != cout1[i])            // this condition checks for 								the carry completion in the 								current cycle... two carry 	
+						variables can not have same 								values(voilates cca)
+{
+temp++;
+}
+}
+for(i=0;i<bit;i++)
+{
+cin0[i]=cout0[i];
+cin1[i]=cout1[i];           // initializing the input carry for the next stage
+}
+} while(temp!=bit);         // condition which checks for the carry completion
+totaldelay = totaldelay+delay;// calculates total delay
+}
+averagedelay = (totaldelay+2)/1000000;// calculates average delay and also 2d delay for sum is also added
+printf(" no of bits= %d and average dealy=%f\n",bit ,averagedelay);
+}
+}
+ 
+int findc0(int a,int b,int c)//function to calculate cout0
+{
+int d;
+if(a==b)
+{
+d=0;
+}
+else
+{
+d=1;
+}
+if(a==0)
+a=1;
+else
+a=0;
+if(b==0)
+b=1;
+else
+b=0;
+return ((a&&b)||(c&&d));// returns cout0=(!a&&!b)||(a^b)cin0
+}
+int findc1(int a,int b,int c)//function to calculate cout1
+{
+int d;
+if(a==b)
+{
+d=0;
+}
+else
+{
+d=1;
+}
+return ((a&&b)||(c&&d)); //returns cout1=(a&&b)||(a^b)cin1
+}
+
